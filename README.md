@@ -1,10 +1,43 @@
 # kubernetes-install-in-ubuntu-22--with-calico-CNI
 https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99
+==================
+10  sudo apt upgrade
+   11  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+   12  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+   13  sudo apt update
+   14  sudo apt install -y containerd.io
+   15  containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+   16  sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+   17  sudo systemctl restart containerd
+   18  sudo systemctl enable containerd
+   19  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/kubernetes-xenial.gpg
+   20  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+   21  sudo apt update
+   22  sudo apt install -y kubelet kubeadm kubectl
+   23  sudo apt-mark hold kubelet kubeadm kubectl
+   24  sudo swapoff -a
+   25  sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+   26  sudo swapoff -a
+   27  sudo tee /etc/modules-load.d/containerd.conf <<EOF
+   28  overlay
+   29  br_netfilter
+   30  EOF
+   31  sudo modprobe overlay
+   32  sudo modprobe br_netfilter
+   33  sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
+   34  net.bridge.bridge-nf-call-ip6tables = 1
+   35  net.bridge.bridge-nf-call-iptables = 1
+   36  net.ipv4.ip_forward = 1
+   37  EOF
+   38  sudo sysctl --system
+   39  sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+   40  systemctl stop firewalld 
+   41  kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+   42  kubectl get pods -n kube-system
 
 
-Write
-Rritsoftwaresolutions
 
+===========
 How to Install Kubernetes Cluster on Ubuntu 22.04 (Step-by-Step Guide)
 Introduction
 Hakan Bayraktar
@@ -229,137 +262,3 @@ Step 11: Deploy test application on cluster (master node)
 
 kubectl run nginx --image=nginx
 
-Kubernetes Cluster
-Ubuntu
-Kubernetes Installation
-Kubeadm
-Containers
-
-Hakan Bayraktar
-Written by Hakan Bayraktar
-188 Followers
-More from Hakan Bayraktar
-How to Install PostgreSQL 15 on Amazon Linux 2023: A Step-by-Step Guide
-Hakan Bayraktar
-
-Hakan Bayraktar
-How to Install PostgreSQL 15 on Amazon Linux 2023: A Step-by-Step Guide
-Introduction
-6 min read·Nov 9, 2023
-
-2
-How to Setup Dynamic NFS Provisioning in a Kubernetes Cluster
-Hakan Bayraktar
-
-Hakan Bayraktar
-How to Setup Dynamic NFS Provisioning in a Kubernetes Cluster
-Dynamic NFS storage provisioning in Kubernetes streamlines the creation and management of NFS volumes for your Kubernetes applications. It…
-4 min read·Nov 3, 2023
-
-How To install SSL Certificate on Apache for CentOS 7
-Hakan Bayraktar
-
-Hakan Bayraktar
-How To install SSL Certificate on Apache for CentOS 7
-Copy the Certificate files to your server.
-2 min read·Jan 7, 2019
-
-5
-How to Create a User in a Kubernetes Cluster and Grant Access
-Hakan Bayraktar
-
-Hakan Bayraktar
-How to Create a User in a Kubernetes Cluster and Grant Access
-In this detailed guide, we’ll illustrate the steps required to create a user, generate necessary certificates, and configure access using a…
-4 min read·Nov 18, 2023
-
-See all from Hakan Bayraktar
-Recommended from Medium
-Top Linux Commands And Tricks For DevOps Tasks
-Vinodha kumara
-
-Vinodha kumara
-Top Linux Commands And Tricks For DevOps Tasks
-This article will help in understanding most of the important and majorly used Linux commands that would be required for a DevOps Engineer.
-10 min read·Jan 19
-
-2
-Project 8 → Three tier application deployment on Kubernetes
-Aakib
-
-Aakib
-Project 8 → Three tier application deployment on Kubernetes
-what do you mean by three tier ?
-12 min read·Jan 26
-
-1
-Lists
-Staff Picks
-574 stories·723 saves
-Stories to Help You Level-Up at Work
-19 stories·460 saves
-Self-Improvement 101
-20 stories·1309 saves
-Productivity 101
-20 stories·1198 saves
-Deploying a Production Kubernetes Cluster in 2023 — A Complete Guide
-Pavel Glukhikh
-
-Pavel Glukhikh
-Deploying a Production Kubernetes Cluster in 2023 — A Complete Guide
-A batteries included guide on deploying a production-ready Kubernetes cluster with external ETCD, load balacing, OCFS2, and Longhorn.
-21 min read·Aug 25, 2023
-
-1
-Advanced End-to-End DevSecOps Kubernetes Three-Tier Project using AWS EKS, ArgoCD, Prometheus…
-Aman Pathak
-
-Aman Pathak
-
-in
-
-Stackademic
-Advanced End-to-End DevSecOps Kubernetes Three-Tier Project using AWS EKS, ArgoCD, Prometheus…
-Project Introduction:
-23 min read·Jan 18
-
-14
-Install Kubernetes 1.29 using Vagrant in under 10 minutes
-Akriotis Kyriakos
-
-Akriotis Kyriakos
-
-in
-
-ITNEXT
-Install Kubernetes 1.29 using Vagrant in under 10 minutes
-Step by step installation of a Kubernetes 1.29 Cluster, with 1 master and 3 worker nodes, on Ubuntu virtual machines using Vagrant
-9 min read·6 days ago
-
-15 Kubernetes Scheduling Scenario Practical Guide — TeckBootcamps
-Mohamed BEN HASSINE
-
-Mohamed BEN HASSINE
-15 Kubernetes Scheduling Scenario Practical Guide — TeckBootcamps
-Kubernetes scheduling is a key component in ensuring that Pods in the cluster run on the appropriate nodes. By flexibly configuring…
-6 min read·Jan 26
-
-See more recommendations
-
-Help
-
-Status
-
-About
-
-Careers
-
-Blog
-
-Privacy
-
-Terms
-
-Text to speech
-
-Teams
